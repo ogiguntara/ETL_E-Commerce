@@ -28,6 +28,6 @@ if __name__ == '__main__':
     name_list = ['users.csv','inventory_items.csv','order_items.csv','orders.csv','events.csv']
     for file_name in name_list:
         start_time = time.time()
-        ingest_to_mongo(f'data/{file_name}')
+        ingest_to_mongo(f'data/{file_name}') 
         end_time = time.time()
         print(f'time : {start_time - end_time} second')

@@ -10,7 +10,7 @@ import time
 def ingest_to_mongo(csvFilePath):
     #read csv transform to  dict
     if csvFilePath == 'data/events.csv':
-        df = pd.read_csv(csvFilePath,nrows=500000)
+        df = pd.read_csv(csvFilePath)
         data = df.to_dict(orient='records')
     else : 
         df = pd.read_csv(csvFilePath)
@@ -21,7 +21,7 @@ def ingest_to_mongo(csvFilePath):
     mycol = mydb[f"{csvFilePath[5:-4]}"]
     mycol.delete_many({})
     mycol.insert_many(data)
-    print(f"{csvFilePath[5:-4]} has been opload to mongo atlas")
+    print(f"[Project Scenario Preparation] {csvFilePath[5:-4]} has been opload to mongodb",end=" ")
     
 
 if __name__ == '__main__':
@@ -30,4 +30,4 @@ if __name__ == '__main__':
         start_time = time.time()
         ingest_to_mongo(f'data/{file_name}') 
         end_time = time.time()
-        print(f'time : {start_time - end_time} second')
+        print(f'for {start_time - end_time} second')

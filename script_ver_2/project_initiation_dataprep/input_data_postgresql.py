@@ -15,7 +15,7 @@ def ingest_to_postgres(file):
         
     data = pd.read_csv(file)
     data.to_sql(name=file[5:-4], con=engine ,if_exists='replace',index=False,schema='final_project')
-    print(f'Table {file[5:-4]} has been created')       
+    print(f"[Project Scenario Preparation] table '{file[5:-4]}' has been created",end=" ")       
 
 
 if __name__ == '__main__':
@@ -24,4 +24,4 @@ if __name__ == '__main__':
         start_time = time.time()
         ingest_to_postgres(f'data/{data}')
         end_time = time.time()
-        print(f'Runtime : {start_time-end_time} second')
+        print(f'for {start_time-end_time} second')

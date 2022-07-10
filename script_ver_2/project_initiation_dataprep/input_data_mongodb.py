@@ -16,7 +16,7 @@ def ingest_to_mongo(csvFilePath):
         df = pd.read_csv(csvFilePath)
         data = df.to_dict(orient='records')
     #upload / insert many to mongo atlas
-    myclient = pymongo.MongoClient('mongodb+srv://ogi:ogi@cluster0.2zf4p.mongodb.net')
+    myclient = pymongo.MongoClient('mongodb://localhost:27017')
     mydb = myclient["final_project"]
     mycol = mydb[f"{csvFilePath[5:-4]}"]
     mycol.delete_many({})

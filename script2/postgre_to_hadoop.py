@@ -15,6 +15,7 @@ def save_to_hdfs(table):
         df.to_csv(writer)
 
 if __name__ == '__main__':
+    
     tables_list = ['distribution_centers','employees']
     for table in tables_list:
         start_time=time.time()

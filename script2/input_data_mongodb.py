@@ -20,7 +20,7 @@ def input_to_mongo(name_list):
     #build sparksession with mongo-spark connector
     my_spark =  SparkSession\
                 .builder\
-                .appName("MyApp")\
+                .appName("input_data_mongodb")\
                 .config("spark.mongodb.input.uri", input_uri)\
                 .config("spark.mongodb.output.uri", output_uri)\
                 .config('spark.jars.packages','org.mongodb.spark:mongo-spark-connector_2.12:2.4.2')\

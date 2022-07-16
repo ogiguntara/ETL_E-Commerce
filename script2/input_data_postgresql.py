@@ -24,7 +24,7 @@ def input_to_postgres(name_list):
     #input credential data to create engine using connection file 
     my_spark = SparkSession \
     .builder \
-    .appName('Python Spark Postgresql') \
+    .appName('input_data_postgresql') \
     .config("spark.jars", "./postgresql-42.2.18.jar") \
     .config('spark.driver.extraClassPath', './postgresql-42.2.18.jar') \
     .getOrCreate()

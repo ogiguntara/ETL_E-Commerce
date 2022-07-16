@@ -10,12 +10,14 @@ class PostgreSQL:
       self.database = cfg['database']
 
   def connect(self, conn_type='engine'):
+    #enginer builder
     if conn_type == 'engine':
         engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port, self.database))
         conn_engine = engine.connect()
         # print("Connect Engine Postgresql \n")
         return engine, conn_engine
     
+    #url and properties builder for spark
     elif conn_type == 'spark':
         url = f"jdbc:postgresql://{self.host}:{self.port}/{self.database}"
         driver = 'org.postgresql.Driver'

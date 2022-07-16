@@ -1,10 +1,13 @@
 #!python3
 
-import pandas as pd
-import connection
 import json
-from sqlalchemy import text
 import time
+import os
+import findspark
+findspark.init()
+from pyspark.sql import SparkSession
+from sqlalchemy import text
+from connection.postgresql import PostgreSQL
 
 
 def input_to_postgres(name_list):
@@ -15,30 +18,48 @@ def input_to_postgres(name_list):
     #open credential data
     with open ('data/credentials.json') as cred:
             credential = json.load(cred)
+    postgre_auth = PostgreSQL(credential['postgresql_source'])
+    url, properties = postgre_auth.connect(conn_type='spark')
+            
     #input credential data to create engine using connection file 
-    postgre_auth = connection.PostgreSQL(credential['postgresql_source'])
-    engine, engine_conn = postgre_auth.connect(conn_type='engine')
+    my_spark = SparkSession \
+    .builder \
+    .appName('Python Spark Postgresql') \
+    .config("spark.jars", "./postgresql-42.2.18.jar") \
+    .config('spark.driver.extraClassPath', './postgresql-42.2.18.jar') \
+    .getOrCreate()
+    my_spark.sparkContext.setLogLevel('ERROR')
     
-    #Create Schema
+    #Create Schema 
     schema = 'final_project'
+    postgre_auth = PostgreSQL(credential['postgresql_source'])
+    enginedl, engine_conn = postgre_auth.connect(conn_type='engine')
     engine_conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS {schema};'))
-
+    enginedl.dispose()
+        
+    file_path = os.getcwd()
+    
     #itteration all over the name list
     for file in name_list:
         start_time = time.time()
         
         #read csv as pandas dataframe
-        data = pd.read_csv(f'data/{file}')
-        datacount=data.shape[0]
+        load_path = f'file://{file_path}/data/{file}'
+        data = my_spark.read.format('csv')\
+                .option('header','true')\
+                .load(load_path)
+
+        datacount = data.count()
+        
         #write to postgresql
-        data.to_sql(name=file[:-4], con=engine ,if_exists='replace',index=False,schema=schema)
+        data.write.jdbc(url=url, table=f'{schema}.{file[:-4]}', mode='overwrite', properties=properties)
         
         end_time = time.time()
         #log per file stored
         print(f"[Project Preparation PostgreSQL] table '{file[:-4]}' ({datacount} rows) has been created for {round(end_time-start_time,2)} second") 
         
     #closing every last connection    
-    engine.dispose()    
+    my_spark.stop()    
     
 
 if __name__ == '__main__':
